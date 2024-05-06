@@ -13,12 +13,25 @@ var app = builder.Build();
 var chairs = app.MapGroup("api/chair");
 
 //TODO: ASIGNACION DE RUTAS A LOS ENDPOINTS
-chairs.MapGet("/", GetChairs);
+chairs.MapPost("/chair", CreateChair);
+chairs.MapGet("/chair", GetChairs);
+chairs.MapGet("/chair/{name}", GetChairByName);
+chairs.MapPut("/chair/{id}", UpdateChair);
+
 
 app.Run();
 
 //TODO: ENDPOINTS SOLICITADOS
-static IResult GetChairs(DataContext db)
+static async Task<IResult> CreateChair(DataContext db, Chair chair)
 {
-    return TypedResults.Ok();
+    Chair? chairFound = await db.FindAsync<Chair>(chair.Id);
+    if (chairFound is not null)
+        return TypedResults.BadRequest("The chair already exists");
+    await db.AddAsync(chair);
+    await db.SaveChangesAsync();
+    return TypedResults.Created("Chair created successfully");
+}
+static async IResult GetChairs(DataContext db)
+{
+    var chairs = await db.
 }
