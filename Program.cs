@@ -10,7 +10,7 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 var app = builder.Build();
 
-var chairs = app.MapGroup("api/chair");
+var chairs = app.MapGroup("api");
 
 //TODO: ASIGNACION DE RUTAS A LOS ENDPOINTS
 chairs.MapPost("/chair", CreateChair);
@@ -24,14 +24,15 @@ app.Run();
 //TODO: ENDPOINTS SOLICITADOS
 static async Task<IResult> CreateChair(DataContext db, Chair chair)
 {
-    Chair? chairFound = await db.FindAsync<Chair>(chair.Id);
+    Chair? chairFound = await db.Chairs.FindAsync(chair.Id);
     if (chairFound is not null)
         return TypedResults.BadRequest("The chair already exists");
     await db.AddAsync(chair);
     await db.SaveChangesAsync();
     return TypedResults.Created("Chair created successfully");
 }
-static async IResult GetChairs(DataContext db)
+static async Task<IResult> GetChairs(DataContext db)
 {
-    var chairs = await db.
+    var chairs = await db.Chairs.ToListAsync();
+    return TypedResults.Ok(chairs);
 }
