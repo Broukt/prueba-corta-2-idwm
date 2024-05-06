@@ -10,7 +10,7 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 var app = builder.Build();
 
-var chairs = app.MapGroup("api");
+var chairs = app.MapGroup("api/chair");
 
 //TODO: ASIGNACION DE RUTAS A LOS ENDPOINTS
 chairs.MapPost("/chair", CreateChair);
@@ -33,6 +33,14 @@ static async Task<IResult> CreateChair(DataContext db, Chair chair)
 }
 static async Task<IResult> GetChairs(DataContext db)
 {
-    var chairs = await db.Chairs.ToListAsync();
+    var chairs = await db.Chairs.ToListAsync<Chair>();
     return TypedResults.Ok(chairs);
+}
+
+static async Task<IResult> GetChairByName(string name, DataContext db)
+{
+    Chair? chairFound = await db.Chairs.Where(c => c.Nombre == name).FirstOrDefaultAsync();
+    if (chairFound is null)
+        return TypedResults.NotFound();
+    return TypedResults.Ok(chairFound);
 }
