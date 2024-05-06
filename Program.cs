@@ -17,7 +17,7 @@ chairs.MapPost("/chair", CreateChair);
 chairs.MapGet("/chair", GetChairs);
 chairs.MapGet("/chair/{name}", GetChairByName);
 chairs.MapPut("/chair/{id}", UpdateChair);
-
+chairs.MapPut("/chair/{id}/stock", IncrementStock);
 
 app.Run();
 
@@ -29,7 +29,7 @@ static async Task<IResult> CreateChair(DataContext db, Chair chair)
         return TypedResults.BadRequest("The chair already exists");
     await db.AddAsync(chair);
     await db.SaveChangesAsync();
-    return TypedResults.Created("Chair created successfully");
+    return TypedResults.Created($"/chair/{chair.Id}", chair);
 }
 static async Task<IResult> GetChairs(DataContext db)
 {
@@ -45,10 +45,24 @@ static async Task<IResult> GetChairByName(string name, DataContext db)
     return TypedResults.Ok(chairFound);
 }
 
-static async Task<IResult> UpdateChair(string id, DataContext db)
+static async Task<IResult> UpdateChair(int id, Chair chair, DataContext db)
 {
     Chair? chairFound = await db.Chairs.FindAsync(id);
     if (chairFound is null)
         return TypedResults.NotFound();
-    
+    chairFound.Nombre = chair.Nombre;
+    chairFound.Tipo = chair.Tipo;
+    chairFound.Material = chair.Material;
+    chairFound.Color = chair.Color;
+    chairFound.Altura = chair.Altura;
+    chairFound.Anchura = chair.Anchura;
+    chairFound.Profundidad = chair.Profundidad;
+    chairFound.Precio = chair.Precio;
+    await db.SaveChangesAsync();
+    return TypedResults.NoContent();
+}
+
+static async Task<IResult> IncrementStock(string id, DataContext db)
+{
+
 }
