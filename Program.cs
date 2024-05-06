@@ -33,7 +33,7 @@ static async Task<IResult> CreateChair(DataContext db, Chair chair)
 }
 static async Task<IResult> GetChairs(DataContext db)
 {
-    var chairs = await db.Chairs.ToListAsync<Chair>();
+    var chairs = await db.Chairs.ToListAsync();
     return TypedResults.Ok(chairs);
 }
 
@@ -43,4 +43,12 @@ static async Task<IResult> GetChairByName(string name, DataContext db)
     if (chairFound is null)
         return TypedResults.NotFound();
     return TypedResults.Ok(chairFound);
+}
+
+static async Task<IResult> UpdateChair(string id, DataContext db)
+{
+    Chair? chairFound = await db.Chairs.FindAsync(id);
+    if (chairFound is null)
+        return TypedResults.NotFound();
+    
 }
